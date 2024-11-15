@@ -1,4 +1,4 @@
-FROM python:3.13.0-alpine3.20 as scraper
+FROM python:3.13.0-alpine3.20 AS scraper
 
 WORKDIR /app/sushi-roulette/scraper
 COPY ./scraper/ .
@@ -7,7 +7,7 @@ RUN python3 -m pip install -r requirements.txt
 RUN mkdir ../json
 RUN python3 hama-sushi.py
 
-FROM golang:1.23.3-alpine3.20 as builder
+FROM golang:1.23.3-alpine3.20 AS builder
 
 WORKDIR /app/sushi-roulette/bot
 COPY ./bot/ .
