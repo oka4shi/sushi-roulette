@@ -25,4 +25,5 @@ COPY --from=builder /app/sushi-roulette/bot/bot ./bot/
 
 RUN chmod +x ./bot/bot
 
+ENV BOT_TOKEN=${BOT_TOKEN}
 ENTRYPOINT ["/bin/sh", "-c", "cd bot && /app/sushi-roulette/bot/bot"]
