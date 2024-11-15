@@ -25,4 +25,4 @@ COPY --from=builder /app/sushi-roulette/bot/bot ./bot/
 
 RUN chmod +x ./bot/bot
 
-ENTRYPOINT cd bot && /app/sushi-roulette/bot/bot
+ENTRYPOINT ["/bin/sh", "-c", "cd bot && /app/sushi-roulette/bot/bot"]
