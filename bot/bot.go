@@ -23,29 +23,6 @@ type channelInfo struct {
 	channel string
 }
 
-func init() {
-	token := os.Getenv("BOT_TOKEN")
-
-	var errD error
-	s, errD = discordgo.New("Bot " + token)
-	if errD != nil {
-		log.Fatalf("Invalid bot params: %v", errD)
-	}
-
-	file, err := os.Open("../dist/hama-sushi.json")
-	if err != nil {
-		log.Fatal("Failed to read a json file: ", err)
-	}
-	defer file.Close()
-
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&hamaData); err != nil {
-		log.Fatal("Failed to parse a json file: ", err)
-	}
-}
-
-const HAMA_URL = "https://www.hama-sushi.co.jp"
-
 type SushiData []struct {
 	Category string `json:"category"`
 	Sushi    []struct {
@@ -60,7 +37,34 @@ type Sushi struct {
 	Category  string
 }
 
-var hamaData SushiData
+var shops = []string{"hama-sushi", "uobei"}
+
+var data = map[string]*SushiData{}
+
+func init() {
+	token := os.Getenv("BOT_TOKEN")
+
+	var errD error
+	s, errD = discordgo.New("Bot " + token)
+	if errD != nil {
+		log.Fatalf("Invalid bot params: %v", errD)
+	}
+
+	for _, shop := range shops {
+		file, err := os.Open(fmt.Sprintf("../dist/%s.json", shop))
+		if err != nil {
+			log.Fatal("Failed to read a json file: ", err)
+		}
+		defer file.Close()
+
+		decoder := json.NewDecoder(file)
+		data[shop] = &SushiData{}
+		if err := decoder.Decode(data[shop]); err != nil {
+			log.Fatal("Failed to parse a json file: ", err)
+		}
+	}
+}
+
 var (
 	commands = []*discordgo.ApplicationCommand{
 		{
@@ -74,36 +78,36 @@ var (
 					Required:    true,
 					Choices: []*discordgo.ApplicationCommandOptionChoice{
 						{
-							Name:  "hama-sushi",
+							Name:  "はま寿司",
 							Value: "hama-sushi",
+						},
+						{
+							Name:  "魚べい",
+							Value: "uobei",
 						},
 					},
 				},
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "difficulty",
-					Description: "どんなメニューが出てくるか(デフォルト: hard)",
+					Name:        "category",
+					Description: "どんなメニューが出てくるか(デフォルト: normal)",
 					Required:    false,
 					Choices: []*discordgo.ApplicationCommandOptionChoice{
 						{
-							Name:  "easy",
-							Value: "easy",
+							Name:  "寿司のみ",
+							Value: "sushi",
 						},
 						{
-							Name:  "nomal",
-							Value: "nomal",
+							Name:  "通常",
+							Value: "normal",
 						},
 						{
-							Name:  "hard",
-							Value: "hard",
-						},
-						{
-							Name:  "dessert",
+							Name:  "デザート",
 							Value: "dessert",
 						},
 						{
-							Name:  "sake",
-							Value: "sake",
+							Name:  "飲み物",
+							Value: "drink",
 						},
 					},
 				},
@@ -114,42 +118,50 @@ var (
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"sushi-roulette": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			brand := i.ApplicationCommandData().Options[0].StringValue()
-			difficulty := ""
+			category := ""
 			if len(i.ApplicationCommandData().Options) >= 2 {
-				difficulty = i.ApplicationCommandData().Options[1].StringValue()
+				category = i.ApplicationCommandData().Options[1].StringValue()
 			}
 
+			var sushi []Sushi
+			var nc []string
 			switch brand {
 			case "hama-sushi":
-				var sushi []Sushi
-				var nc []string
-
-				switch difficulty {
-				case "easy":
-					nc = append(nc, "にぎり", "軍艦・細巻き・その他", "贅沢握り・三種盛り")
-				case "nomal":
+				switch category {
+				case "sushi":
 					nc = append(nc, "にぎり", "軍艦・細巻き・その他", "贅沢握り・三種盛り", "肉握り", "至福の一貫")
 				case "dessert":
 					nc = append(nc, "デザート・ドリンク")
-				case "sake":
+				case "drink":
 					nc = append(nc, "アルコール")
 				default:
 					nc = append(nc, "にぎり", "軍艦・細巻き・その他", "贅沢握り・三種盛り", "肉握り", "至福の一貫", "サイドメニュー", "期間限定")
 				}
+			case "uobei":
+				switch category {
+				case "sushi":
+					nc = append(nc, "握り", "軍艦・巻物・いなり")
+				case "dessert":
+					nc = append(nc, "デザート・ドリンク")
+				case "drink":
+					nc = append(nc, "デザート・ドリンク")
+				default:
+					nc = append(nc, "握り", "軍艦・巻物・いなり", "サイドメニュー")
 
-				for _, data := range hamaData {
-					if slices.Contains(nc, data.Category) {
-						for _, s := range data.Sushi {
-							sushi = append(sushi, Sushi{s.Name, HAMA_URL + s.ImagePath, data.Category})
-						}
+				}
+			}
+
+			for _, sushiAll := range *data[brand] {
+				if slices.Contains(nc, sushiAll.Category) {
+					for _, s := range sushiAll.Sushi {
+						sushi = append(sushi, Sushi{s.Name, s.ImagePath, sushiAll.Category})
 					}
 				}
-
-				rand.Seed(time.Now().UnixNano())
-				res := sushi[rand.Intn(len(sushi))]
-				command_response_with_photo(s, i, fmt.Sprintf("%v\n%v", res.Category, res.Name), res.ImagePath)
-
 			}
+
+			rand.Seed(time.Now().UnixNano())
+			res := sushi[rand.Intn(len(sushi))]
+			command_response_with_photo(s, i, fmt.Sprintf("%v\n%v", res.Category, res.Name), res.ImagePath)
 		},
 	}
 )

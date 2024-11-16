@@ -4,6 +4,7 @@ import urllib.request
 
 import bs4
 
+rootURL = "https://www.hama-sushi.co.jp"
 URL = "https://www.hama-sushi.co.jp/menu/"
 
 req = urllib.request.Request(URL)
@@ -45,7 +46,7 @@ for section in sections:
                     'div.men-products-item__thumb > img')['data-src']
                 sushi_in_category.append({
                     "name": name,
-                    "img_url": img_url,
+                    "img_url": rootURL + img_url,
                 })
 
         sushi.append({"category": category_name, "sushi": sushi_in_category})
