@@ -90,15 +90,15 @@ var (
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
 					Name:        "category",
-					Description: "どんなメニューが出てくるか(デフォルト: normal)",
+					Description: "どんなメニューが出てくるか(デフォルト: 全て)",
 					Required:    false,
 					Choices: []*discordgo.ApplicationCommandOptionChoice{
 						{
-							Name:  "寿司のみ",
+							Name:  "寿司",
 							Value: "sushi",
 						},
 						{
-							Name:  "通常",
+							Name:  "全て",
 							Value: "normal",
 						},
 						{
@@ -161,7 +161,7 @@ var (
 
 			rand.Seed(time.Now().UnixNano())
 			res := sushi[rand.Intn(len(sushi))]
-			command_response_with_photo(s, i, fmt.Sprintf("%v\n%v", res.Category, res.Name), res.ImagePath)
+			command_response_with_photo(s, i, fmt.Sprintf("%vにある%vのメニューから商品を選びました！\n\n%v\n%v", brand, category, res.Category, res.Name), res.ImagePath)
 		},
 	}
 )
