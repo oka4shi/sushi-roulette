@@ -1,4 +1,3 @@
-import re
 import json
 import urllib.request
 
@@ -41,4 +40,3 @@ for element in menu:
 
 with open('../json/uobei.json', 'w') as f:
     json.dump(sushi, f, ensure_ascii=False, indent=2)
-
