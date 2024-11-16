@@ -7,6 +7,7 @@ RUN python3 -m pip install -r requirements.txt
 RUN mkdir ../json
 RUN python3 hama-sushi.py
 RUN python3 uobei.py
+RUN python3 sushiro.py
 
 FROM golang:1.23.3-alpine3.20 AS builder
 

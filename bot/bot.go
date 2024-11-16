@@ -146,7 +146,17 @@ var (
 					nc = append(nc, "デザート・ドリンク")
 				default:
 					nc = append(nc, "握り", "軍艦・巻物・いなり", "サイドメニュー")
-
+				}
+			case "sushiro":
+				switch category {
+				case "sushi":
+					nc = append(nc, "にぎり", "軍艦・巻物")
+				case "dessert":
+					nc = append(nc, "デザート")
+				case "drink":
+					nc = append(nc, "ドリンク")
+				default:
+					nc = append(nc, "にぎり", "軍艦・巻物", "サイドメニュー")
 				}
 			}
 
