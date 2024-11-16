@@ -36,7 +36,7 @@ type Sushi struct {
 	Category  string
 }
 
-var shops = []string{"hama-sushi", "uobei"}
+var shops = []string{"hama-sushi", "uobei", "sushiro"}
 
 var data = map[string]*SushiData{}
 
@@ -83,6 +83,10 @@ var (
 						{
 							Name:  "魚べい",
 							Value: "uobei",
+						},
+						{
+							Name:  "スシロー",
+							Value: "sushiro",
 						},
 					},
 				},
