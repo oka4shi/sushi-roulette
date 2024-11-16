@@ -173,7 +173,7 @@ var (
 			}
 
 			res := sushi[rand.IntN(len(sushi))]
-			command_response_with_photo(s, i, fmt.Sprintf("%vにある%vのメニューから商品を選びました！\n\n%v\n%v", brand, category, res.Category, res.Name), res.ImagePath)
+			command_response_with_photo(s, i, fmt.Sprintf("%v\n%v", res.Category, res.Name), res.ImagePath)
 		},
 	}
 )
