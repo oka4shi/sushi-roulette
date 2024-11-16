@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"golang.org/x/exp/slices"
 	"log"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"os/signal"
 	"strings"
@@ -159,8 +159,7 @@ var (
 				}
 			}
 
-			rand.Seed(time.Now().UnixNano())
-			res := sushi[rand.Intn(len(sushi))]
+			res := sushi[rand.IntN(len(sushi))]
 			command_response_with_photo(s, i, fmt.Sprintf("%vにある%vのメニューから商品を選びました！\n\n%v\n%v", brand, category, res.Category, res.Name), res.ImagePath)
 		},
 	}
