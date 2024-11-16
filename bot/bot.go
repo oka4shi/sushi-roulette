@@ -10,7 +10,6 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
-	"time"
 	"unicode/utf8"
 
 	"github.com/bwmarrin/discordgo"
